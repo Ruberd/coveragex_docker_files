@@ -1,0 +1,53 @@
+version: "3.8"
+services:
+
+  service-coveragex:
+    build:
+      context: D:\coverageX\coverageX_assessment_backend
+    container_name: service-coveragex
+    ports:
+      - "9008:9008"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - app-network
+
+  react-frontend:
+    build: D:\coverageX\frontend
+    container_name: react-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: koverdrive
+      MYSQL_ROOT_PASSWORD: koverdrive
+    networks:
+      - app-network
+
+  mysql-workbench:
+    image: linuxserver/mysql-workbench
+    container_name: mysql-workbench
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata   # adjust your timezone
+    ports:
+      - "3001:3000"   # Workbench web UI will be available on localhost:3001
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+
+networks:
+  app-network:
+    driver: bridge
